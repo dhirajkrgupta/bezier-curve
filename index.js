@@ -4,7 +4,7 @@ function isPointInCircle(point, circle, radius) {
   return dx * dx + dy * dy < radius * radius;
 }
 
-//B(t) = ((1−t)^3)P0 + 3((1−t)^2)tP1 + 3(1−t)(t^2)P2 + (t^3)P3
+//B(t) = (1−t)³P₀ + 3(1−t)²tP₁ + 3(1−t)t²P₂ + t³P₃
 function cubicBezier(t, p0, p1, p2, p3) {
   const c0 = Math.pow(1 - t, 3);
   const c1 = 3 * Math.pow(1 - t, 2) * t;
@@ -16,7 +16,15 @@ function cubicBezier(t, p0, p1, p2, p3) {
   return { x, y };
 }
 
-//
+//B'(t) = 3(1−t)²(P₁−P₀) + 6(1−t)t(P₂−P₁) + 3t²(P₃−P₂)
+function slope(t, p0, p1, p2, p3) {
+  const c0 = 3*Math.pow(1 - t, 2);
+  const c1 = 6 *(1 - t) * t;
+  const c2 = 3 * Math.pow(t, 2);
+  const dx = c0 *(p1.x- p0.x )+ c1 *( p2.x-p1.x )+ c2 * (p3.x-p2.x);
+  const dy = c0 *(p1.y- p0.y )+ c1 *( p2.y-p1.y )+ c2 * (p3.y-p2.y);
+  return dy/dx;
+}
 
 window.onload = () => {
   const canvas = document.getElementById("mycanvas");
@@ -31,16 +39,17 @@ window.onload = () => {
   }
   // Control Points:
   // P0 and P3 -fixed endpoints
-  const p0 = { x: 50, y: 200 };
-  const p3 = { x: 550, y: 200 };
+  const p0 = { x: 300, y: 200 };
+  const p3 = { x: 600, y: 200 };
 
   // P1 and P2 - dynamic and draggable
-  const p1 = { x: 150, y: 200 };
-  const p2 = { x: 450, y: 200 };
+  const p1 = { x: 400, y: 200 };
+  const p2 = { x: 500, y: 200 };
 
   // Dragging State
   let draggedPoint = null;
   const controlPointRadius = 8; // Clickable radius for draggable points
+  const tangentLength=80;
 
   canvas.addEventListener("mousedown", (e) => {
     const pos = getMousePos(e);
@@ -101,6 +110,19 @@ window.onload = () => {
     ctx.lineWidth = 3;
     ctx.stroke();
 
+    // Draw the tangents
+    for (let t = 0.2; t <1.0; t += 0.2) {
+        const m = slope(t, p0, p1, p2, p3);
+        const {x,y}=cubicBezier(t, p0, p1, p2, p3);
+        const u1=(tangentLength/2)*(1/(Math.sqrt(1+m*m)));
+        const u2=(tangentLength/2)*(m/(Math.sqrt(1+m*m)));
+        ctx.beginPath();
+        ctx.moveTo(x-u1,y-u2)
+        ctx.lineTo(x+u1,y+u2);
+        ctx.strokeStyle = "#ee224eff";
+        ctx.lineWidth = 2;
+        ctx.stroke();
+    }
     // Draw control point handles
     ctx.beginPath();
     ctx.moveTo(p0.x, p0.y);
