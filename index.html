@@ -4,8 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bezier Curve</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        
+        canvas {
+            border: 2px solid #333;
+            border-radius: 0.5rem; /* rounded corners */
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
 </head>
-<body>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
+    <div class="bg-white p-6 sm:p-8 rounded-lg shadow-lg text-center w-full max-w-2xl">
+        <canvas id="mycanvas" width="600" height="400" class="mx-auto"></canvas>
+    </div>
     
+    <script src="index.js"></script>
 </body>
 </html>
