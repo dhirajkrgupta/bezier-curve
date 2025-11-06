@@ -13,9 +13,10 @@ function cubicBezier(t, p0, p1, p2, p3) {
 
   const x = c0 * p0.x + c1 * p1.x + c2 * p2.x + c3 * p3.x;
   const y = c0 * p0.y + c1 * p1.y + c2 * p2.y + c3 * p3.y;
-
   return { x, y };
 }
+
+//
 
 window.onload = () => {
   const canvas = document.getElementById("mycanvas");
@@ -127,8 +128,6 @@ window.onload = () => {
         ctx.arc(p.x, p.y, controlPointRadius, 0, 2 * Math.PI); // Used clickable radius
         ctx.fill();
     });
-
-    requestAnimationFrame(animate);
   }
   animate();
 };
