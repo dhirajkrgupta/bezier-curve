@@ -128,6 +128,7 @@ window.onload = () => {
         ctx.arc(p.x, p.y, controlPointRadius, 0, 2 * Math.PI); // Used clickable radius
         ctx.fill();
     });
+    requestAnimationFrame(animate)
   }
   animate();
 };
