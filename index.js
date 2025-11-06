@@ -36,10 +36,10 @@ window.onload = () => {
 
   // Base positions (unscaled)
   const BASE_POSITIONS = {
-    p0: { x: 300, y: 200 },
+    p0: { x: 100, y: 100 },
     p1: { x: 400, y: 200 },
     p2: { x: 500, y: 200 },
-    p3: { x: 600, y: 200 }
+    p3: { x: 800, y: 400 }
   };
 
   // Scale factor to maintain proportions
@@ -110,12 +110,13 @@ window.onload = () => {
   };
 
   // Physics parameters
-  const k = 0.15;
+  const k = 0.1;
   const damping = 0.25;
   // Dragging State
   let draggedPoint = null;
-  const BASE_CONTROL_POINT_RADIUS = 8;
-  const BASE_TANGENT_LENGTH = 80;
+  const BASE_CONTROL_POINT_RADIUS = 10;
+  const BASE_TANGENT_LENGTH = 150;
+  let hue=0;
 
   // Dynamic sizes that scale with canvas
   function getControlPointRadius() {
@@ -188,21 +189,26 @@ window.onload = () => {
       ctx.lineTo(point.x, point.y);
     }
     ctx.strokeStyle = "#22D3EE";
-    ctx.lineWidth = 3 * Math.max(0.5, Math.min(1, scaleFactor));
+    ctx.lineWidth = 10 * Math.max(0.5, Math.min(1, scaleFactor));
+    ctx.lineCap="round";
     ctx.stroke();
 
     // Draw the tangents
-    for (let t = 0.2; t < 1.0; t += 0.2) {
-      const m = slope(t, p0, p1, p2, p3);
-      const { x, y } = cubicBezier(t, p0, p1, p2, p3);
+    for (let n = 1; n<10; n+=1) {
+      const m = slope(n*0.1, p0, p1, p2, p3);
+      const { x, y } = cubicBezier(n*0.1, p0, p1, p2, p3);
       const tangentLen = getTangentLength();
       const u1 = (tangentLen / 2) * (1 / Math.sqrt(1 + m * m));
       const u2 = (tangentLen / 2) * (m / Math.sqrt(1 + m * m));
+
+      
+
       ctx.beginPath();
       ctx.moveTo(x - u1, y - u2);
       ctx.lineTo(x + u1, y + u2);
-      ctx.strokeStyle = "#ee224eff";
-      ctx.lineWidth = 2;
+      ctx.strokeStyle = "#000000a8";
+      ctx.lineWidth = 4;
+      ctx.lineCap="round";
       ctx.stroke();
     }
     // Draw control point handles
@@ -212,22 +218,24 @@ window.onload = () => {
     ctx.moveTo(p3.x, p3.y);
     ctx.lineTo(p2.x, p2.y);
     ctx.strokeStyle = "#F87171";
-    ctx.lineWidth = 1;
+    ctx.lineWidth = 5;
+    ctx.lineCap="round";
     ctx.stroke();
 
     // Draw control points
 
     // Fixed points
-    ctx.fillStyle = "#F87171";
+    ctx.fillStyle = "#df1f1fff";
     [p0, p3].forEach((p) => {
       ctx.beginPath();
       ctx.arc(p.x, p.y, 6 * Math.max(0.5, Math.min(1, scaleFactor)), 0, 2 * Math.PI);
       ctx.fill();
     });
 
-    // Dynamic points
-    ctx.fillStyle = "#FB923C";
-    [p1, p2].forEach((p) => {
+    // Dynamic points (color changes each frame)
+    [p1, p2].forEach((p, i) => {
+      hue+=1;
+      ctx.fillStyle = `hsl(${Math.round(hue)}, 85%, 50%)`;
       ctx.beginPath();
       ctx.arc(p.x, p.y, getControlPointRadius(), 0, 2 * Math.PI);
       ctx.fill();
