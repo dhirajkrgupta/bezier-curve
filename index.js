@@ -30,11 +30,13 @@ window.onload = () => {
   const canvas = document.getElementById("mycanvas");
   const ctx = canvas.getContext("2d");
 
-  function getMousePos(e) {
+  function getPointerPos(e) {
     const rect = canvas.getBoundingClientRect();
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
     return {
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top,
+      x: clientX - rect.left,
+      y: clientY - rect.top,
     };
   }
   // Control Points:
@@ -52,10 +54,14 @@ window.onload = () => {
   const controlPointRadius = 8; // Clickable radius for draggable points
   const tangentLength = 80;
 
-  canvas.addEventListener("mousedown", (e) => {
-    const pos = getMousePos(e);
+ 
+  canvas.addEventListener('touchstart', (e) => e.preventDefault(), { passive: false });
+  canvas.addEventListener('touchmove', (e) => e.preventDefault(), { passive: false });
 
-    // Check if we clicked on p1 or p2
+  canvas.addEventListener("pointerdown", (e) => {
+    const pos = getPointerPos(e);
+
+    // Check if we clicked/touched on p1 or p2
     if (isPointInCircle(pos, p1, controlPointRadius)) {
       draggedPoint = p1;
     } else if (isPointInCircle(pos, p2, controlPointRadius)) {
@@ -64,21 +70,25 @@ window.onload = () => {
 
     if (draggedPoint) {
       canvas.style.cursor = "grabbing";
+      canvas.setPointerCapture(e.pointerId);
     }
   });
 
-  canvas.addEventListener("mouseup", () => {
+  canvas.addEventListener("pointerup", (e) => {
+    if (draggedPoint) {
+      canvas.releasePointerCapture(e.pointerId);
+    }
     draggedPoint = null;
     canvas.style.cursor = "crosshair"; // Reset to default
   });
 
-  canvas.addEventListener("mouseleave", () => {
-    draggedPoint = null; // Stop dragging if mouse leaves
+  canvas.addEventListener("pointerleave", () => {
+    draggedPoint = null; // Stop dragging if pointer leaves
     canvas.style.cursor = "crosshair";
   });
 
-  canvas.addEventListener("mousemove", (event) => {
-    const pos = getMousePos(event);
+  canvas.addEventListener("pointermove", (event) => {
+    const pos = getPointerPos(event);
 
     if (draggedPoint) {
       // If we are dragging a point, update its target position
