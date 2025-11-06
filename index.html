@@ -6,20 +6,32 @@
     <title>Bezier Curve</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        
         canvas {
             border: 2px solid #333;
-            border-radius: 0.5rem; /* rounded corners */
+            border-radius: 0.5rem;
+            width: 100% !important;
+            height: auto !important;
+            max-width: 900px;
+            touch-action: none; /* Prevent touch scrolling */
         }
         body {
             font-family: 'Inter', sans-serif;
         }
+        .canvas-container {
+            width: 100%;
+            max-width: 900px;
+            margin: 0 auto;
+            position: relative;
+            aspect-ratio: 16/9;
+        }
     </style>
 </head>
 <body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
-    <div class="bg-white p-6 sm:p-8 rounded-lg shadow-lg text-center">
-        <p>Cubic Bezier Curve</p>
-        <canvas id="mycanvas" width="900" height="500" class="mx-auto"></canvas>
+    <div class="bg-white p-4 sm:p-6 rounded-lg shadow-lg text-center w-full max-w-[950px]">
+        <h1 class="text-xl font-semibold mb-4 text-gray-800">Cubic Bezier Curve</h1>
+        <div class="canvas-container">
+            <canvas id="mycanvas" width="900" height="500" class="mx-auto"></canvas>
+        </div>
     </div>
     
     <script src="index.js"></script>

@@ -29,6 +29,40 @@ function slope(t, p0, p1, p2, p3) {
 window.onload = () => {
   const canvas = document.getElementById("mycanvas");
   const ctx = canvas.getContext("2d");
+  
+  // Initial dimensions
+  const INITIAL_WIDTH = 900;
+  const INITIAL_HEIGHT = 500;
+  
+  // Scale factor to maintain proportions
+  let scaleFactor = 1;
+  
+  function updateCanvasSize() {
+    const container = canvas.parentElement;
+    const containerWidth = container.clientWidth;
+    scaleFactor = containerWidth / INITIAL_WIDTH;
+    
+    canvas.width = containerWidth;
+    canvas.height = INITIAL_HEIGHT * scaleFactor;
+    
+    // Scale all dimensions
+    p0.x = 300 * scaleFactor;
+    p0.y = 200 * scaleFactor;
+    p3.x = 600 * scaleFactor;
+    p3.y = 200 * scaleFactor;
+    
+    // Update control points while maintaining relative positions
+    p1.x = p1.x * scaleFactor;
+    p1.y = p1.y * scaleFactor;
+    p2.x = p2.x * scaleFactor;
+    p2.y = p2.y * scaleFactor;
+  }
+
+  // Handle resize
+  const resizeObserver = new ResizeObserver(() => {
+    updateCanvasSize();
+  });
+  resizeObserver.observe(canvas.parentElement);
 
   function getPointerPos(e) {
     const rect = canvas.getBoundingClientRect();
@@ -47,12 +81,21 @@ window.onload = () => {
   // P1 and P2 - dynamic and draggable
   const p1 = { x: 400, y: 200, vx: 0, vy: 0, tx: 400, ty: 200 };
   const p2 = { x: 500, y: 200, vx: 0, vy: 0, tx: 500, ty: 200 };
-  const k=0.05;
-  const damping=0.1;
+  const k = 0.05;
+  const damping = 0.1;
   // Dragging State
   let draggedPoint = null;
-  const controlPointRadius = 8; // Clickable radius for draggable points
-  const tangentLength = 80;
+  const BASE_CONTROL_POINT_RADIUS = 8;
+  const BASE_TANGENT_LENGTH = 80;
+  
+  // Dynamic sizes that scale with canvas
+  function getControlPointRadius() {
+    return BASE_CONTROL_POINT_RADIUS * Math.max(0.5, Math.min(1, scaleFactor));
+  }
+  
+  function getTangentLength() {
+    return BASE_TANGENT_LENGTH * scaleFactor;
+  }
 
  
   canvas.addEventListener('touchstart', (e) => e.preventDefault(), { passive: false });
@@ -62,9 +105,9 @@ window.onload = () => {
     const pos = getPointerPos(e);
 
     // Check if we clicked/touched on p1 or p2
-    if (isPointInCircle(pos, p1, controlPointRadius)) {
+    if (isPointInCircle(pos, p1, getControlPointRadius())) {
       draggedPoint = p1;
-    } else if (isPointInCircle(pos, p2, controlPointRadius)) {
+    } else if (isPointInCircle(pos, p2, getControlPointRadius())) {
       draggedPoint = p2;
     }
 
@@ -95,8 +138,8 @@ window.onload = () => {
       draggedPoint.tx = pos.x;
       draggedPoint.ty = pos.y;
     } else if (
-      isPointInCircle(pos, p1, controlPointRadius) ||
-      isPointInCircle(pos, p2, controlPointRadius)
+      isPointInCircle(pos, p1, getControlPointRadius()) ||
+      isPointInCircle(pos, p2, getControlPointRadius())
     ) {
       canvas.style.cursor = "grab";
     } else {
@@ -116,15 +159,16 @@ window.onload = () => {
       ctx.lineTo(point.x, point.y);
     }
     ctx.strokeStyle = "#22D3EE";
-    ctx.lineWidth = 3;
+    ctx.lineWidth = 3 * Math.max(0.5, Math.min(1, scaleFactor));
     ctx.stroke();
 
     // Draw the tangents
     for (let t = 0.2; t < 1.0; t += 0.2) {
       const m = slope(t, p0, p1, p2, p3);
       const { x, y } = cubicBezier(t, p0, p1, p2, p3);
-      const u1 = (tangentLength / 2) * (1 / Math.sqrt(1 + m * m));
-      const u2 = (tangentLength / 2) * (m / Math.sqrt(1 + m * m));
+      const tangentLen = getTangentLength();
+      const u1 = (tangentLen / 2) * (1 / Math.sqrt(1 + m * m));
+      const u2 = (tangentLen / 2) * (m / Math.sqrt(1 + m * m));
       ctx.beginPath();
       ctx.moveTo(x - u1, y - u2);
       ctx.lineTo(x + u1, y + u2);
@@ -148,7 +192,7 @@ window.onload = () => {
     ctx.fillStyle = "#F87171";
     [p0, p3].forEach((p) => {
       ctx.beginPath();
-      ctx.arc(p.x, p.y, 6, 0, 2 * Math.PI); // Slightly smaller
+      ctx.arc(p.x, p.y, 6 * Math.max(0.5, Math.min(1, scaleFactor)), 0, 2 * Math.PI);
       ctx.fill();
     });
 
@@ -156,7 +200,7 @@ window.onload = () => {
     ctx.fillStyle = "#FB923C";
     [p1, p2].forEach((p) => {
       ctx.beginPath();
-      ctx.arc(p.x, p.y, controlPointRadius, 0, 2 * Math.PI); // Used clickable radius
+      ctx.arc(p.x, p.y, getControlPointRadius(), 0, 2 * Math.PI);
       ctx.fill();
       //update according to spring eqaution  acceleration = -k * (position - target) - damping * velocity
       p.vx+=-k*(p.x-p.tx)-damping*p.vx;
