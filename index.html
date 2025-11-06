@@ -33,6 +33,25 @@
             <canvas id="mycanvas" width="900" height="500" class="mx-auto"></canvas>
         </div>
     </div>
+    <div class="p-4 h-full flex">
+        <div class="bg-white p-4 sm:p-6 rounded-lg shadow-lg  w-fit">
+        <div>
+            <input type="checkbox" name="tangents" id="tangents">
+            <label for="tangents">Show Tangents</label>
+        </div>
+        <div>
+            <input type="range" name="k" id="k" min="0" max="1" value="0.1" step="0.01">
+            <span id="k_value"></span>
+            <label for="k">k</label>
+        </div>
+        <div>
+            <input type="range" name="damping" id="damping" in="0" max="1.00" value="0.25" step="0.01">
+            <span id="damping_value"></span>
+            <label for="damping">damping</label>
+        </div>
+    </div>
+    </div>
+    
     
     <script src="index.js"></script>
 </body>
