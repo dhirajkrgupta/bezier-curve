@@ -29,33 +29,48 @@ function slope(t, p0, p1, p2, p3) {
 window.onload = () => {
   const canvas = document.getElementById("mycanvas");
   const ctx = canvas.getContext("2d");
-  
-  // Initial dimensions
+
+  // Initial dimensions and positions
   const INITIAL_WIDTH = 900;
   const INITIAL_HEIGHT = 500;
-  
+
+  // Base positions (unscaled)
+  const BASE_POSITIONS = {
+    p0: { x: 300, y: 200 },
+    p1: { x: 400, y: 200 },
+    p2: { x: 500, y: 200 },
+    p3: { x: 600, y: 200 }
+  };
+
   // Scale factor to maintain proportions
   let scaleFactor = 1;
-  
   function updateCanvasSize() {
     const container = canvas.parentElement;
     const containerWidth = container.clientWidth;
-    scaleFactor = containerWidth / INITIAL_WIDTH;
-    
-    canvas.width = containerWidth;
-    canvas.height = INITIAL_HEIGHT * scaleFactor;
-    
-    // Scale all dimensions
-    p0.x = 300 * scaleFactor;
-    p0.y = 200 * scaleFactor;
-    p3.x = 600 * scaleFactor;
-    p3.y = 200 * scaleFactor;
-    
-    // Update control points while maintaining relative positions
-    p1.x = p1.x * scaleFactor;
-    p1.y = p1.y * scaleFactor;
-    p2.x = p2.x * scaleFactor;
-    p2.y = p2.y * scaleFactor;
+    const newScaleFactor = containerWidth / INITIAL_WIDTH;
+
+    // Only update positions if scale factor changed
+    if (newScaleFactor !== scaleFactor) {
+      const scaleRatio = newScaleFactor / scaleFactor;
+      scaleFactor = newScaleFactor;
+      canvas.width = containerWidth;
+      canvas.height = INITIAL_HEIGHT * scaleFactor;
+
+      // Update positions using base positions
+      p0.x = BASE_POSITIONS.p0.x * scaleFactor;
+      p0.y = BASE_POSITIONS.p0.y * scaleFactor;
+      p3.x = BASE_POSITIONS.p3.x * scaleFactor;
+      p3.y = BASE_POSITIONS.p3.y * scaleFactor;
+
+      // Scale control points from their current positions !!imp
+      [p1, p2].forEach(p => {
+        p.x *= scaleRatio;
+        p.y *= scaleRatio;
+        p.tx *= scaleRatio;
+        p.ty *= scaleRatio;
+      });
+    }
+
   }
 
   // Handle resize
@@ -74,30 +89,44 @@ window.onload = () => {
     };
   }
   // Control Points:
-  // P0 and P3 -fixed endpoints
-  const p0 = { x: 300, y: 200 };
-  const p3 = { x: 600, y: 200 };
+  // P0 and P3 - fixed endpoints
+  const p0 = { x: BASE_POSITIONS.p0.x, y: BASE_POSITIONS.p0.y };
+  const p3 = { x: BASE_POSITIONS.p3.x, y: BASE_POSITIONS.p3.y };
 
   // P1 and P2 - dynamic and draggable
-  const p1 = { x: 400, y: 200, vx: 0, vy: 0, tx: 400, ty: 200 };
-  const p2 = { x: 500, y: 200, vx: 0, vy: 0, tx: 500, ty: 200 };
-  const k = 0.05;
-  const damping = 0.1;
+  const p1 = {
+    x: BASE_POSITIONS.p1.x,
+    y: BASE_POSITIONS.p1.y,
+    vx: 0, vy: 0,
+    tx: BASE_POSITIONS.p1.x,
+    ty: BASE_POSITIONS.p1.y
+  };
+  const p2 = {
+    x: BASE_POSITIONS.p2.x,
+    y: BASE_POSITIONS.p2.y,
+    vx: 0, vy: 0,
+    tx: BASE_POSITIONS.p2.x,
+    ty: BASE_POSITIONS.p2.y
+  };
+
+  // Physics parameters
+  const k = 0.15;
+  const damping = 0.25;
   // Dragging State
   let draggedPoint = null;
   const BASE_CONTROL_POINT_RADIUS = 8;
   const BASE_TANGENT_LENGTH = 80;
-  
+
   // Dynamic sizes that scale with canvas
   function getControlPointRadius() {
     return BASE_CONTROL_POINT_RADIUS * Math.max(0.5, Math.min(1, scaleFactor));
   }
-  
+
   function getTangentLength() {
     return BASE_TANGENT_LENGTH * scaleFactor;
   }
 
- 
+
   canvas.addEventListener('touchstart', (e) => e.preventDefault(), { passive: false });
   canvas.addEventListener('touchmove', (e) => e.preventDefault(), { passive: false });
 
@@ -105,9 +134,9 @@ window.onload = () => {
     const pos = getPointerPos(e);
 
     // Check if we clicked/touched on p1 or p2
-    if (isPointInCircle(pos, p1, getControlPointRadius())) {
+    if (isPointInCircle(pos, p1, getControlPointRadius()*2)) {
       draggedPoint = p1;
-    } else if (isPointInCircle(pos, p2, getControlPointRadius())) {
+    } else if (isPointInCircle(pos, p2, getControlPointRadius()*2)) {
       draggedPoint = p2;
     }
 
@@ -138,8 +167,8 @@ window.onload = () => {
       draggedPoint.tx = pos.x;
       draggedPoint.ty = pos.y;
     } else if (
-      isPointInCircle(pos, p1, getControlPointRadius()) ||
-      isPointInCircle(pos, p2, getControlPointRadius())
+      isPointInCircle(pos, p1, getControlPointRadius()*2) ||
+      isPointInCircle(pos, p2, getControlPointRadius()*2)
     ) {
       canvas.style.cursor = "grab";
     } else {
@@ -202,11 +231,30 @@ window.onload = () => {
       ctx.beginPath();
       ctx.arc(p.x, p.y, getControlPointRadius(), 0, 2 * Math.PI);
       ctx.fill();
-      //update according to spring eqaution  acceleration = -k * (position - target) - damping * velocity
-      p.vx+=-k*(p.x-p.tx)-damping*p.vx;
-      p.vy+=-k*(p.y-p.ty)-damping*p.vy
-      p.x+=p.vx;
-      p.y+=p.vy;
+      // Update with improved spring physics
+      if (!draggedPoint || p !== draggedPoint) {
+        // Only apply physics when not being dragged
+        const dx = p.tx - p.x;
+        const dy = p.ty - p.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        
+        if (dist > 0.01) {  // Only update if there's significant movement needed
+          p.vx += -k * (p.x - p.tx);
+          p.vy += -k * (p.y - p.ty);
+          
+          // Apply damping
+          p.vx *= (1 - damping);
+          p.vy *= (1 - damping);
+          
+          // Update position
+          p.x += p.vx;
+          p.y += p.vy;
+        } else {
+          // Reset velocities when nearly stopped
+          p.vx = 0;
+          p.vy = 0;
+        }
+      }
 
     });
     requestAnimationFrame(animate);
