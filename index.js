@@ -18,12 +18,12 @@ function cubicBezier(t, p0, p1, p2, p3) {
 
 //B'(t) = 3(1−t)²(P₁−P₀) + 6(1−t)t(P₂−P₁) + 3t²(P₃−P₂)
 function slope(t, p0, p1, p2, p3) {
-  const c0 = 3*Math.pow(1 - t, 2);
-  const c1 = 6 *(1 - t) * t;
+  const c0 = 3 * Math.pow(1 - t, 2);
+  const c1 = 6 * (1 - t) * t;
   const c2 = 3 * Math.pow(t, 2);
-  const dx = c0 *(p1.x- p0.x )+ c1 *( p2.x-p1.x )+ c2 * (p3.x-p2.x);
-  const dy = c0 *(p1.y- p0.y )+ c1 *( p2.y-p1.y )+ c2 * (p3.y-p2.y);
-  return dy/dx;
+  const dx = c0 * (p1.x - p0.x) + c1 * (p2.x - p1.x) + c2 * (p3.x - p2.x);
+  const dy = c0 * (p1.y - p0.y) + c1 * (p2.y - p1.y) + c2 * (p3.y - p2.y);
+  return dy / dx;
 }
 
 window.onload = () => {
@@ -43,13 +43,14 @@ window.onload = () => {
   const p3 = { x: 600, y: 200 };
 
   // P1 and P2 - dynamic and draggable
-  const p1 = { x: 400, y: 200 };
-  const p2 = { x: 500, y: 200 };
-
+  const p1 = { x: 400, y: 200, vx: 0, vy: 0, tx: 400, ty: 200 };
+  const p2 = { x: 500, y: 200, vx: 0, vy: 0, tx: 500, ty: 200 };
+  const k=0.05;
+  const damping=0.1;
   // Dragging State
   let draggedPoint = null;
   const controlPointRadius = 8; // Clickable radius for draggable points
-  const tangentLength=80;
+  const tangentLength = 80;
 
   canvas.addEventListener("mousedown", (e) => {
     const pos = getMousePos(e);
@@ -80,18 +81,16 @@ window.onload = () => {
     const pos = getMousePos(event);
 
     if (draggedPoint) {
-      // If we are dragging a point, update its position
-      draggedPoint.x = pos.x;
-      draggedPoint.y = pos.y;
+      // If we are dragging a point, update its target position
+      draggedPoint.tx = pos.x;
+      draggedPoint.ty = pos.y;
+    } else if (
+      isPointInCircle(pos, p1, controlPointRadius) ||
+      isPointInCircle(pos, p2, controlPointRadius)
+    ) {
+      canvas.style.cursor = "grab";
     } else {
-      if (
-        isPointInCircle(pos, p1, controlPointRadius) ||
-        isPointInCircle(pos, p2, controlPointRadius)
-      ) {
-        canvas.style.cursor = "grab";
-      } else {
-        canvas.style.cursor = "crosshair";
-      }
+      canvas.style.cursor = "crosshair";
     }
   });
 
@@ -111,17 +110,17 @@ window.onload = () => {
     ctx.stroke();
 
     // Draw the tangents
-    for (let t = 0.2; t <1.0; t += 0.2) {
-        const m = slope(t, p0, p1, p2, p3);
-        const {x,y}=cubicBezier(t, p0, p1, p2, p3);
-        const u1=(tangentLength/2)*(1/(Math.sqrt(1+m*m)));
-        const u2=(tangentLength/2)*(m/(Math.sqrt(1+m*m)));
-        ctx.beginPath();
-        ctx.moveTo(x-u1,y-u2)
-        ctx.lineTo(x+u1,y+u2);
-        ctx.strokeStyle = "#ee224eff";
-        ctx.lineWidth = 2;
-        ctx.stroke();
+    for (let t = 0.2; t < 1.0; t += 0.2) {
+      const m = slope(t, p0, p1, p2, p3);
+      const { x, y } = cubicBezier(t, p0, p1, p2, p3);
+      const u1 = (tangentLength / 2) * (1 / Math.sqrt(1 + m * m));
+      const u2 = (tangentLength / 2) * (m / Math.sqrt(1 + m * m));
+      ctx.beginPath();
+      ctx.moveTo(x - u1, y - u2);
+      ctx.lineTo(x + u1, y + u2);
+      ctx.strokeStyle = "#ee224eff";
+      ctx.lineWidth = 2;
+      ctx.stroke();
     }
     // Draw control point handles
     ctx.beginPath();
@@ -138,19 +137,25 @@ window.onload = () => {
     // Fixed points
     ctx.fillStyle = "#F87171";
     [p0, p3].forEach((p) => {
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, 6, 0, 2 * Math.PI); // Slightly smaller
-        ctx.fill();
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, 6, 0, 2 * Math.PI); // Slightly smaller
+      ctx.fill();
     });
 
     // Dynamic points
     ctx.fillStyle = "#FB923C";
     [p1, p2].forEach((p) => {
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, controlPointRadius, 0, 2 * Math.PI); // Used clickable radius
-        ctx.fill();
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, controlPointRadius, 0, 2 * Math.PI); // Used clickable radius
+      ctx.fill();
+      //update according to spring eqaution  acceleration = -k * (position - target) - damping * velocity
+      p.vx+=-k*(p.x-p.tx)-damping*p.vx;
+      p.vy+=-k*(p.y-p.ty)-damping*p.vy
+      p.x+=p.vx;
+      p.y+=p.vy;
+
     });
-    requestAnimationFrame(animate)
+    requestAnimationFrame(animate);
   }
   animate();
 };
