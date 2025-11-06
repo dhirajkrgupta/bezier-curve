@@ -22,19 +22,18 @@
             max-width: 900px;
             margin: 0 auto;
             position: relative;
-            aspect-ratio: 16/9;
         }
     </style>
 </head>
-<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
-    <div class="bg-white p-4 sm:p-6 rounded-lg shadow-lg text-center w-full max-w-[950px]">
+<body class="bg-gray-100 max-h-screen flex flex-col lg:flex-row justify-center  md:p-4">
+    <div class="bg-white p-4 sm:p-6 md:rounded-lg md:shadow-lg text-center w-full max-w-[950px]">
         <h1 class="text-xl font-semibold mb-4 text-gray-800">Cubic Bezier Curve</h1>
-        <div class="canvas-container">
+        <div class="canvas-container sm:h-full">
             <canvas id="mycanvas" width="900" height="500" class="mx-auto"></canvas>
         </div>
     </div>
-    <div class="p-4 h-full flex">
-        <div class="bg-white p-4 sm:p-6 rounded-lg shadow-lg  w-fit">
+    <div class="md:p-4 h-full flex justify-center">
+        <div class="bg-white p-4 sm:p-6 md:rounded-lg md:shadow-lg  w-fit">
         <div>
             <input type="checkbox" name="tangents" id="tangents">
             <label for="tangents">Show Tangents</label>
