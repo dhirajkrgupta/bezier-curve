@@ -88,14 +88,15 @@ export class BezierController {
   }
 
   handleResize(container) {
-    const newWidth = container.clientWidth;
-    const newScale= Math.max(0.5, newWidth / this.system.INITIAL_WIDTH);
+
+    const newWidth = container.clientWidth
+    const newScale= newWidth / this.system.INITIAL_WIDTH;
 
     const dpr = window.devicePixelRatio || 1;
-    this.canvas.width = newWidth * dpr;
-    this.canvas.height = this.system.INITIAL_HEIGHT * newScale * dpr;
+    this.canvas.width = newWidth *dpr;
+    this.canvas.height = this.system.INITIAL_HEIGHT* newScale*dpr;
 
-    this.system.scale(newScaleX);
+    this.system.scale(newScale);
     this.view.ctx.scale(dpr, dpr);
     this.view.render();
   }
@@ -114,7 +115,6 @@ export class BezierController {
 
     this.system.update(dt);
     this.view.render();
-    // console.log("hey")
     this.rafId = requestAnimationFrame(this.animate.bind(this));
   }
 
