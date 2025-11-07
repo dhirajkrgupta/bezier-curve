@@ -1,4 +1,4 @@
-class BezierSystem {
+export class BezierSystem {
 
     constructor(basepositions, config) {
         this.p0 = basepositions.p0;
@@ -17,14 +17,14 @@ class BezierSystem {
             tx: basepositions.p2.x,
             ty: basepositions.p2.y,
         };
-        this.k = config.k || 0.1;
-        this.damping = config.damping || 0.25;
-        this.showtangents = config.showtangents || false;
+        this.k =config?.k || 0.1;
+        this.damping = config?.damping || 0.25;
+        this.showtangents = config?.showtangents || false;
         this.scaleFactor = 1;
-        this.BASE_RADIUS = config.baseRadius || 20;
-        this.BASE_TANGENT_LENGTH = config.baseTangent || 200;
-        this.INITIAL_WIDTH = config.initialWidth || 900;
-        this.INITIAL_HEIGHT = config.initialHeight || 500;
+        this.BASE_RADIUS = config?.baseRadius || 20;
+        this.BASE_TANGENT_LENGTH = config?.baseTangent || 200;
+        this.INITIAL_WIDTH = config?.initialWidth || 900;
+        this.INITIAL_HEIGHT = config?.initialHeight || 500;
     }
 
     update(dt = 1) {
@@ -98,7 +98,9 @@ class BezierSystem {
             this.p2.ty = y;
         }
     }
-
+    setScaleFactor(scale) {
+        this.scaleFactor = scale;
+    }
     setParams(k, damping) {
         this.k = k ? k : this.k;
         this.damping = damping ? damping : this.damping;
