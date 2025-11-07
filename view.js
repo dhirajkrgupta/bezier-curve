@@ -1,4 +1,4 @@
-import { cubicBezier, cubicBezierSlope, cubicBezierTangentEndPoints } from "./math.js";
+import { cubicBezier, cubicBezierTangentEndPoints } from "./math.js";
 export class BezierView {
 
     constructor(canvas, system) {
@@ -12,6 +12,7 @@ export class BezierView {
     }
 
     drawCurve() {
+        
         const { p0, p1, p2, p3 } = this.system.getPoints();
         this.ctx.beginPath();
         this.ctx.moveTo(p0.x, p0.y);
@@ -53,7 +54,6 @@ export class BezierView {
         this.ctx.stroke();
     }
     drawPoints() {
-
         const { p0, p3 } = this.system.getPoints();
         this.ctx.fillStyle = "#df1f1fff";
         [p0, p3].forEach((p) => {
@@ -64,7 +64,7 @@ export class BezierView {
 
         const { p1, p2 } = this.system.getPoints();
         this.ctx.fillStyle = "#1fdf1fff";
-        [p1, p2].forEach((p) => {
+        [p1,p2].forEach((p) => {
             this.ctx.beginPath();
             this.ctx.arc(p.x, p.y, 20 * Math.max(0.5, Math.min(1, this.system.getScale())), 0, 2 * Math.PI);
             this.ctx.fill();
@@ -73,8 +73,9 @@ export class BezierView {
     }
     render() {
         this.clear();
+        
         this.drawCurve();
-        if (this.system.showTangents) {
+        if (this.system.shouldShowTangents()) {
             this.drawTangents();
         }
         this.drawHandles();

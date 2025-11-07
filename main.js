@@ -1,5 +1,6 @@
 import { BezierSystem } from './system.js';
 import { BezierView } from './view.js';
+import { BezierController } from './controller.js';
 
 document.addEventListener('DOMContentLoaded', () => {
   const BASE_POSITIONS = {
@@ -9,7 +10,19 @@ document.addEventListener('DOMContentLoaded', () => {
     p3: { x: 700, y: 300 },
   };
   const canvas = document.getElementById('mycanvas');
-  const system = new BezierSystem(BASE_POSITIONS,null);
+  const container = canvas.parentElement;
+
+  const system = new BezierSystem(BASE_POSITIONS, null);
   const view = new BezierView(canvas, system);
-  view.render();
+  const controller = new BezierController(system, view, canvas);
+
+  const k_input = document.getElementById('k');
+  const damping_input = document.getElementById('damping');
+  const toggle_checkbox = document.getElementById('tangents');
+  controller.bindUI(k_input, damping_input, toggle_checkbox);
+  controller.handlePointerEvents();
+  controller.bindResizeObserver(container);
+  controller.start();
+
+
 });

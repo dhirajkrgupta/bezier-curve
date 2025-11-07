@@ -1,14 +1,16 @@
-class BezierController {
+import { isPointInCircle } from "./math.js";
+export class BezierController {
   constructor(system, view, canvas) {
     this.system = system;
     this.view = view;
     this.canvas = canvas;
     this.lastTime = 0;
     this.rafId = null;
-    this.draggedPoint = null;
+    this.draggedPointId = null;
   }
 
   bindUI(kInput, dampingInput, toggleCheckbox) {
+
     toggleCheckbox.addEventListener("input", (e) => {
       this.system.toggleTangents(e.target.checked);
     });
@@ -21,11 +23,89 @@ class BezierController {
     });
   }
 
-  handlePointerEvents() {
-    
+  getPointerPos(e) {
+    const rect = this.canvas.getBoundingClientRect();
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    return {
+      x: clientX - rect.left,
+      y: clientY - rect.top,
+    };
   }
 
-  handleResize() { }
+  handlePointerEvents() {
+    this.canvas.addEventListener("pointerdown", (e) => {
+      const pos = this.getPointerPos(e);
+      // Check if we clicked/touched on p1 or p2
+      const { p1, p2 } = this.system.getPoints();
+      if (isPointInCircle(pos, p1, this.system.getControlRadius() * 2)) {
+        this.draggedPointId = 1;
+      } else if (isPointInCircle(pos, p2, this.system.getControlRadius() * 2)) {
+        this.draggedPointId = 2;
+      }
+
+      if (this.draggedPointId) {
+        this.canvas.style.cursor = "grabbing";
+        this.canvas.setPointerCapture(e.pointerId);
+      }
+    });
+
+    this.canvas.addEventListener("pointermove", (event) => {
+      const pos = this.getPointerPos(event);
+      const { p1, p2 } = this.system.getPoints();
+      if (this.draggedPointId) {
+        this.system.setTarget(this.draggedPointId, pos.x, pos.y);
+      }
+      else if (isPointInCircle(pos, p1, this.system.getControlRadius() * 2) || isPointInCircle(pos, p2, this.system.getControlRadius() * 2)) {
+        this.canvas.style.cursor = "grab";
+      }
+      else {
+        this.canvas.style.cursor = "crosshair";
+      }
+    });
+
+    this.canvas.addEventListener("pointerup", (e) => {
+      const pos = this.getPointerPos(e);
+      const { p1, p2 } = this.system.getPoints();
+      if (this.draggedPointId) {
+        this.canvas.releasePointerCapture(e.pointerId);
+      }
+      this.draggedPointId = null;
+      if (isPointInCircle(pos, p1, this.system.getControlRadius() * 2) || isPointInCircle(pos, p2, this.system.getControlRadius() * 2)) {
+        
+        this.canvas.style.cursor = "grab";
+      }
+      else {
+        this.canvas.style.cursor = "crosshair";
+      }
+    });
+
+    this.canvas.addEventListener("pointerleave", () => {
+      this.draggedPointId = null; // Stop dragging if pointer leaves
+      this.canvas.style.cursor = "crosshair";
+    });
+
+  }
+
+  handleResize(container) {
+    const newWidth = container.clientWidth;
+    const newScale= Math.max(0.5, newWidth / this.system.INITIAL_WIDTH);
+
+    const dpr = window.devicePixelRatio || 1;
+    this.canvas.width = newWidth * dpr;
+    this.canvas.height = this.system.INITIAL_HEIGHT * newScale * dpr;
+
+    this.system.scale(newScaleX);
+    this.view.ctx.scale(dpr, dpr);
+    this.view.render();
+  }
+
+  bindResizeObserver(container) {
+    this.resizeObserver = new ResizeObserver(() => {
+      this.handleResize(container);
+    });
+    this.resizeObserver.observe(container);
+  }
 
   animate() {
     const now = performance.now();
@@ -33,7 +113,8 @@ class BezierController {
     this.lastTime = now;
 
     this.system.update(dt);
-    this.view.render(this.system);
+    this.view.render();
+    // console.log("hey")
     this.rafId = requestAnimationFrame(this.animate.bind(this));
   }
 
