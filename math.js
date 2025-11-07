@@ -2,7 +2,7 @@ export function isPointInCircle(point, circle, radius) {
   const dx = point.x - circle.x;
   const dy = point.y - circle.y;
   return dx * dx + dy * dy < radius * radius;
-}
+} 
 
 //B(t) = (1−t)³P₀ + 3(1−t)²tP₁ + 3(1−t)t²P₂ + t³P₃
 export function cubicBezier(t, p0, p1, p2, p3) {
