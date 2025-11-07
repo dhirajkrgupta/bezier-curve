@@ -102,11 +102,11 @@ export class BezierSystem {
         this.scaleFactor = scale;
     }
     setParams(k, damping) {
-        this.k = k ? k : this.k;
+        this.k=k? k : this.k;
         this.damping = damping ? damping : this.damping;
     }
 
-    toggleTangents() {
-        this.showtangents = !this.showtangents;
+    toggleTangents(show) {
+        this.showtangents = show;
     }
 }
