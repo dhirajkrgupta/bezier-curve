@@ -1,5 +1,7 @@
 # Interactive Cubic Bézier Curve Editor
 
+![Preview](preview.gif)
+
 An interactive editor for cubic Bézier curves with spring-damped physics, responsive design, and touch support.
 
 ## Mathematical Model
