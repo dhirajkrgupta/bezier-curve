@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Bezier Curve</title>
-    <script src="https://cdn.tailwindcss.com"></script>
     <style>
         canvas {
             border: 2px solid #333;
@@ -12,46 +12,145 @@
             width: 100% !important;
             height: auto !important;
             max-width: 900px;
-            touch-action: none; /* Prevent touch scrolling */
+            touch-action: none;
+            /* Prevent touch scrolling */
         }
+
         body {
             font-family: 'Inter', sans-serif;
         }
+
         .canvas-container {
             width: 100%;
             max-width: 900px;
             margin: 0 auto;
             position: relative;
         }
+
+
+        body {
+            min-height: 100vh;
+            max-height: fit-content;
+            background-color: #f3f4f6;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        @media (min-width: 1024px) {
+            body {
+                flex-direction: row;
+                justify-content: center;
+            }
+        }
+
+
+        .main-container {
+            background-color: white;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 100%;
+            max-width: 950px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        @media (min-width: 640px) {
+            .main-container {
+                padding: 1.5rem;
+            }
+        }
+
+        h1 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #1f2937;
+        }
+
+        .canvas-container {
+            flex-grow: 1;
+        }
+
+        canvas {
+            display: block;
+            margin: 0 auto;
+        }
+
+        .sidebar {
+            padding: 1rem;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+        }
+
+        .sidebar-inner {
+            background-color: white;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: fit-content;
+        }
+
+        @media (min-width: 640px) {
+            .sidebar-inner {
+                padding: 1.5rem;
+            }
+        }
+
+        .sidebar-inner div {
+            margin-bottom: 0.75rem;
+        }
+
+        input[type="range"] {
+            width: 150px;
+        }
+
+        label {
+            margin-left: 0.25rem;
+            color: #111827;
+            font-size: 0.95rem;
+        }
+
+        span {
+            margin: 0 0.5rem;
+            color: #374151;
+        }
     </style>
 </head>
-<body class="min-h-screen bg-gray-100 max-h-fit  flex flex-col lg:flex-row justify-center  md:p-4">
-    <div class="bg-white p-4 sm:p-6 md:rounded-lg md:shadow-lg text-center w-full max-w-[950px] h-full flex flex-col">
-        <h1 class="text-xl font-semibold mb-4 text-gray-800">Cubic Bezier Curve</h1>
-        <div class="canvas-container flex-grow ">
-            <canvas id="mycanvas" width="900" height="500" class="mx-auto"></canvas>
+
+<body>
+    <div class="main-container">
+        <h1>Cubic Bezier Curve</h1>
+        <div class="canvas-container">
+            <canvas id="mycanvas" width="900" height="500"></canvas>
         </div>
     </div>
-    <div class="p-4 h-full flex justify-center">
-        <div class="bg-white p-4 sm:p-6 md:rounded-lg md:shadow-lg  w-fit">
-        <div>
-            <input type="checkbox" name="tangents" id="tangents">
-            <label for="tangents">Show Tangents</label>
-        </div>
-        <div>
-            <input type="range" name="k" id="k" min="0" max="1" value="0.1" step="0.01">
-            <span id="k_value"></span>
-            <label for="k">k</label>
-        </div>
-        <div>
-            <input type="range" name="damping" id="damping" in="0" max="1.00" value="0.25" step="0.01">
-            <span id="damping_value"></span>
-            <label for="damping">damping</label>
+
+    <div class="sidebar">
+        <div class="sidebar-inner">
+            <div>
+                <input type="checkbox" name="tangents" id="tangents">
+                <label for="tangents">Show Tangents</label>
+            </div>
+            <div>
+                <input type="range" name="k" id="k" min="0" max="1" value="0.1" step="0.01">
+                <span id="k_value"></span>
+                <label for="k">k</label>
+            </div>
+            <div>
+                <input type="range" name="damping" id="damping" min="0" max="1.00" value="0.25" step="0.01">
+                <span id="damping_value"></span>
+                <label for="damping">damping</label>
+            </div>
         </div>
     </div>
-    </div>
-    
-    
-    <script type="module"  src="main.js"></script>
+    <script type="module" src="main.js"></script>
 </body>
+
+
 </html>
