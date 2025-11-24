@@ -85,16 +85,13 @@ export class BezierController {
   }
 
   handleResize(container) {
-
     const newWidth = container.clientWidth
     const scale = newWidth / 900;
-
     const dpr = window.devicePixelRatio || 1;
     this.canvas.width = newWidth * dpr;
-    this.canvas.height = this.system.height * scale * dpr;
-
+    this.canvas.height = 500 * scale * dpr;
     this.canvas.style.width = `${newWidth}px`;
-    this.canvas.style.height = `${this.system.height * scale}px`;
+    this.canvas.style.height = `${500 * scale}px`;
 
     this.view.render();
   }

@@ -21,7 +21,45 @@ document.addEventListener('DOMContentLoaded', () => {
   controller.bindUI(k_input, damping_input, toggle_checkbox);
   controller.handlePointerEvents();
   controller.bindResizeObserver(container);
+
+  const sidebar = document.querySelector('.sidebar');
+  let sidebarState = {
+    top: 0,
+    right: 0,
+    isDragged: false,
+    x:0,
+    y:0
+  }
+  sidebar.addEventListener("pointerdown", (e) => {
+    sidebarState.isDragged = true;
+    sidebarState.x = e.touches ? e.touches[0].clientX : e.clientX;
+    sidebarState.y = e.touches ? e.touches[0].clientY : e.clientY;
+    sidebar.style.cursor = "grabbing";
+    sidebar.setPointerCapture(e.pointerId);
+  });
+
+  sidebar.addEventListener("pointermove", (e) => {
+    if (sidebarState.isDragged) {
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+      const dx=clientX-sidebarState.x;
+      const dy=clientY-sidebarState.y;
+      sidebarState.top+=dy;
+      sidebarState.right-=dx;
+      e.target.style.top=`${sidebarState.top}px`;
+      e.target.style.right=`${sidebarState.right}px`;
+      sidebarState.x=clientX;
+      sidebarState.y=clientY;
+    }else{
+      sidebar.style.cursor = "grab";
+    }
+  });
+
+  sidebar.addEventListener("pointerup", (e) => {
+    sidebarState.isDragged = false;
+    sidebar.style.cursor = "grab";
+    sidebar.releasePointerCapture(e.pointerId);
+  });
   controller.start();
-
-
 });
+

@@ -1,0 +1,21 @@
+*{
+    box-sizing: border-box;
+    margin: 0px;
+    padding: 0px;
+}
+
+.main-container {
+    width: 100%;
+}
+
+.canvas-container{
+    max-width: 900px;
+}
+
+.sidebar{
+    position: absolute;
+    top:0;
+    right: 0;
+    padding: 2rem;
+}
+
