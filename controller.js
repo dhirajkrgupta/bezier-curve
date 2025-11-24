@@ -27,15 +27,13 @@ export class BezierController {
     const rect = this.canvas.getBoundingClientRect();
     const clientX = e.touches ? e.touches[0].clientX : e.clientX;
     const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-    return {
-      x: clientX - rect.left,
-      y: clientY - rect.top,
-    };
+    return this.view.screenToWorld(clientX - rect.left, clientY - rect.top);
   }
 
   handlePointerEvents() {
     this.canvas.addEventListener("pointerdown", (e) => {
       const pos = this.getPointerPos(e);
+      console.log(pos)
       // Check if we clicked/touched on p1 or p2
       const { p1, p2 } = this.system.getPoints();
       if (isPointInCircle(pos, p1, this.system.getControlRadius() * 2)) {
@@ -72,7 +70,7 @@ export class BezierController {
       }
       this.draggedPointId = null;
       if (isPointInCircle(pos, p1, this.system.getControlRadius() * 2) || isPointInCircle(pos, p2, this.system.getControlRadius() * 2)) {
-        
+
         this.canvas.style.cursor = "grab";
       }
       else {
@@ -90,13 +88,11 @@ export class BezierController {
   handleResize(container) {
 
     const newWidth = container.clientWidth
-    const scale= newWidth /900;
+    const scale = newWidth / 900;
 
     const dpr = window.devicePixelRatio || 1;
-    this.canvas.width = newWidth *dpr;
-    this.canvas.height = this.system.INITIAL_HEIGHT* newScale*dpr;
-
-    this.system.scale(newScale);
+    this.canvas.width = newWidth * dpr;
+    this.canvas.height = this.system.height * scale * dpr;
     this.view.ctx.scale(dpr, dpr);
     this.view.render();
   }

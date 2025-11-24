@@ -64,28 +64,38 @@ export class BezierView {
 
         const { p1, p2 } = this.system.getPoints();
         this.ctx.fillStyle = "#1fdf1fff";
-        [p1,p2].forEach((p) => {
+        [p1, p2].forEach((p) => {
             this.ctx.beginPath();
             this.ctx.arc(p.x, p.y, 20, 0, 2 * Math.PI);
             this.ctx.fill();
         });
 
     }
-    fitTransform(){
-        let scaleX=this.canvas.width/this.system.width;
-        let scaleY=this.canvas.height/this.system.height;
-        let scale=Math.min(scaleX,scaleY);
+    fitTransform() {
+        let scaleX = this.canvas.width / this.system.width;
+        let scaleY = this.canvas.height / this.system.height;
+        let scale = Math.min(scaleX, scaleY);
 
         const offsetX = (this.canvas.width - this.system.width * scale) / 2;
         const offsetY = (this.canvas.height - this.system.height * scale) / 2;
 
-        this.ctx.translate(offsetX, offsetY);
-        this.ctx.scale(scale, scale);
+        return { scale, offsetX, offsetY };
+    }
+    screenToWorld(x, y) {
+        const scale = Math.min(
+            this.canvas.width / this.system.width,
+            this.canvas.height / this.system.height
+        );
+        const offsetX = (this.canvas.width - this.system.width  * scale) / 2;
+        const offsetY = (this.canvas.height - this.system.height * scale) / 2;
+        return { x: (x - offsetX) / scale, y: (y - offsetY) / scale };
     }
     render() {
         this.clear();
         this.ctx.save();
-        this.fitTransform();
+        const { scale, offsetX, offsetY } = this.fitTransform();
+        this.ctx.translate(offsetX, offsetY);
+        this.ctx.scale(scale, scale);
         this.drawCurve();
         if (this.system.shouldShowTangents()) {
             this.drawTangents();
