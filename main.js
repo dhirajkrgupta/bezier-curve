@@ -3,6 +3,7 @@ import { BezierView } from './view.js';
 import { BezierController } from './controller.js';
 
 document.addEventListener('DOMContentLoaded', () => {
+  handlesidebar();
   const BASE_POSITIONS = {
     p0: { x: 200, y: 200 },
     p1: { x: 100, y: 400 },
@@ -21,14 +22,18 @@ document.addEventListener('DOMContentLoaded', () => {
   controller.bindUI(k_input, damping_input, toggle_checkbox);
   controller.handlePointerEvents();
   controller.bindResizeObserver(container);
+  controller.start();
+});
 
+
+const handlesidebar = () => {
   const sidebar = document.querySelector('.sidebar');
   let sidebarState = {
     top: 0,
     right: 0,
     isDragged: false,
-    x:0,
-    y:0
+    x: 0,
+    y: 0
   }
   sidebar.addEventListener("pointerdown", (e) => {
     sidebarState.isDragged = true;
@@ -42,15 +47,15 @@ document.addEventListener('DOMContentLoaded', () => {
     if (sidebarState.isDragged) {
       const clientX = e.touches ? e.touches[0].clientX : e.clientX;
       const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-      const dx=clientX-sidebarState.x;
-      const dy=clientY-sidebarState.y;
-      sidebarState.top+=dy;
-      sidebarState.right-=dx;
-      e.target.style.top=`${sidebarState.top}px`;
-      e.target.style.right=`${sidebarState.right}px`;
-      sidebarState.x=clientX;
-      sidebarState.y=clientY;
-    }else{
+      const dx = clientX - sidebarState.x;
+      const dy = clientY - sidebarState.y;
+      sidebarState.top += dy;
+      sidebarState.right -= dx;
+      e.target.style.top = `${sidebarState.top}px`;
+      e.target.style.right = `${sidebarState.right}px`;
+      sidebarState.x = clientX;
+      sidebarState.y = clientY;
+    } else {
       sidebar.style.cursor = "grab";
     }
   });
@@ -60,6 +65,4 @@ document.addEventListener('DOMContentLoaded', () => {
     sidebar.style.cursor = "grab";
     sidebar.releasePointerCapture(e.pointerId);
   });
-  controller.start();
-});
-
+}
