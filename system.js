@@ -40,8 +40,8 @@ export class BezierSystem {
             let nextY = point.y + point.vy * dt;
 
             const r = this.getControlRadius();
-            const W = this.width*this.scaleFactor;
-            const H = this.height*this.scaleFactor;
+            const W = this.width;
+            const H = this.height;
 
             if (nextX + r > W) {
                 nextX = W - r;

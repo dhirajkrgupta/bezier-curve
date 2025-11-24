@@ -33,7 +33,6 @@ export class BezierController {
   handlePointerEvents() {
     this.canvas.addEventListener("pointerdown", (e) => {
       const pos = this.getPointerPos(e);
-      console.log(pos)
       // Check if we clicked/touched on p1 or p2
       const { p1, p2 } = this.system.getPoints();
       if (isPointInCircle(pos, p1, this.system.getControlRadius() * 2)) {
@@ -93,7 +92,10 @@ export class BezierController {
     const dpr = window.devicePixelRatio || 1;
     this.canvas.width = newWidth * dpr;
     this.canvas.height = this.system.height * scale * dpr;
-    this.view.ctx.scale(dpr, dpr);
+
+    this.canvas.style.width = `${newWidth}px`;
+    this.canvas.style.height = `${this.system.height * scale}px`;
+
     this.view.render();
   }
 

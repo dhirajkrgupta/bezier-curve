@@ -79,23 +79,24 @@ export class BezierView {
         const offsetX = (this.canvas.width - this.system.width * scale) / 2;
         const offsetY = (this.canvas.height - this.system.height * scale) / 2;
 
-        return { scale, offsetX, offsetY };
+        this.ctx.translate(offsetX, offsetY);
+        this.ctx.scale(scale, scale);
     }
     screenToWorld(x, y) {
         const scale = Math.min(
             this.canvas.width / this.system.width,
             this.canvas.height / this.system.height
         );
-        const offsetX = (this.canvas.width - this.system.width  * scale) / 2;
+        const offsetX = (this.canvas.width - this.system.width * scale) / 2;
         const offsetY = (this.canvas.height - this.system.height * scale) / 2;
         return { x: (x - offsetX) / scale, y: (y - offsetY) / scale };
     }
     render() {
         this.clear();
         this.ctx.save();
-        const { scale, offsetX, offsetY } = this.fitTransform();
-        this.ctx.translate(offsetX, offsetY);
-        this.ctx.scale(scale, scale);
+        const dpr = window.devicePixelRatio || 1;
+        this.ctx.scale(dpr, dpr);
+        this.fitTransform();
         this.drawCurve();
         if (this.system.shouldShowTangents()) {
             this.drawTangents();
