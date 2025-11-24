@@ -5,6 +5,7 @@ export class BezierView {
         this.canvas = canvas;
         this.ctx = canvas.getContext("2d");
         this.system = system;
+        this.scale
     }
 
     clear() {
@@ -12,7 +13,6 @@ export class BezierView {
     }
 
     drawCurve() {
-        
         const { p0, p1, p2, p3 } = this.system.getPoints();
         this.ctx.beginPath();
         this.ctx.moveTo(p0.x, p0.y);
@@ -71,14 +71,22 @@ export class BezierView {
         });
 
     }
+    fitTransform(){
+        let scaleX=this.canvas.width/this.system.width;
+        let scaleY=this.canvas.height/this.system.height;
+        this.ctx.scale(scaleX,scaleY);
+    }
     render() {
         this.clear();
         
+        this.ctx.save();
+        this.fitTransform();
         this.drawCurve();
         if (this.system.shouldShowTangents()) {
             this.drawTangents();
         }
         this.drawHandles();
         this.drawPoints();
+        this.ctx.restore();
     }
 }

@@ -22,8 +22,8 @@ export class BezierSystem {
         this.showtangents = config?.showtangents || false;
         this.BASE_RADIUS = config?.baseRadius || 20;
         this.BASE_TANGENT_LENGTH = config?.baseTangent || 200;
-        this.INITIAL_WIDTH = config?.initialWidth || 900;
-        this.INITIAL_HEIGHT = config?.initialHeight || 500;
+        this.width = config?.width || 900;
+        this.height = config?.height || 500;
     }
 
     update(dt = 1) {
@@ -40,8 +40,8 @@ export class BezierSystem {
             let nextY = point.y + point.vy * dt;
 
             const r = this.getControlRadius();
-            const W = this.INITIAL_WIDTH*this.scaleFactor;
-            const H = this.INITIAL_HEIGHT*this.scaleFactor;
+            const W = this.width*this.scaleFactor;
+            const H = this.height*this.scaleFactor;
 
             if (nextX + r > W) {
                 nextX = W - r;
@@ -105,4 +105,5 @@ export class BezierSystem {
     toggleTangents(show) {
         this.showtangents = show;
     }
+
 }
