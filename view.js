@@ -21,7 +21,7 @@ export class BezierView {
             this.ctx.lineTo(x, y);
         }
         this.ctx.strokeStyle = "#22D3EE";
-        this.ctx.lineWidth = 10 * Math.max(0.5, Math.min(1, this.system.getScale()));;
+        this.ctx.lineWidth = 10
         this.ctx.lineCap = "round";
         this.ctx.stroke();
     }
@@ -35,7 +35,7 @@ export class BezierView {
             this.ctx.moveTo(start.x, start.y);
             this.ctx.lineTo(end.x, end.y);
             this.ctx.strokeStyle = "#161616e5";
-            this.ctx.lineWidth = 4 * Math.max(0.5, Math.min(1, this.system.getScale()));;
+            this.ctx.lineWidth = 4
             this.ctx.lineCap = "round";
             this.ctx.stroke();
         }
@@ -49,7 +49,7 @@ export class BezierView {
         this.ctx.moveTo(p3.x, p3.y);
         this.ctx.lineTo(p2.x, p2.y);
         this.ctx.strokeStyle = "#F87171";
-        this.ctx.lineWidth = 5 * Math.max(0.5, Math.min(1, this.system.getScale()));;
+        this.ctx.lineWidth = 5
         this.ctx.lineCap = "round";
         this.ctx.stroke();
     }
@@ -58,7 +58,7 @@ export class BezierView {
         this.ctx.fillStyle = "#df1f1fff";
         [p0, p3].forEach((p) => {
             this.ctx.beginPath();
-            this.ctx.arc(p.x, p.y, 6 * Math.max(0.5, Math.min(1, this.system.getScale())), 0, 2 * Math.PI);
+            this.ctx.arc(p.x, p.y, 6, 0, 2 * Math.PI);
             this.ctx.fill();
         });
 
@@ -66,7 +66,7 @@ export class BezierView {
         this.ctx.fillStyle = "#1fdf1fff";
         [p1,p2].forEach((p) => {
             this.ctx.beginPath();
-            this.ctx.arc(p.x, p.y, 20 * Math.max(0.5, Math.min(1, this.system.getScale())), 0, 2 * Math.PI);
+            this.ctx.arc(p.x, p.y, 20, 0, 2 * Math.PI);
             this.ctx.fill();
         });
 

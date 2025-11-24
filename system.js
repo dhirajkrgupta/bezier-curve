@@ -20,7 +20,6 @@ export class BezierSystem {
         this.k = config?.k || 0.1;
         this.damping = config?.damping || 0.25;
         this.showtangents = config?.showtangents || false;
-        this.scaleFactor = 1;
         this.BASE_RADIUS = config?.baseRadius || 20;
         this.BASE_TANGENT_LENGTH = config?.baseTangent || 200;
         this.INITIAL_WIDTH = config?.initialWidth || 900;
@@ -66,37 +65,13 @@ export class BezierSystem {
         });
     }
 
-    scale(newScaleFactor) {
-
-        const scaleRatio = newScaleFactor / this.scaleFactor;
-        this.scaleFactor = newScaleFactor;
-        // Adjust control points based on scale ratio
-
-        [this.p0, this.p3].forEach(p => {
-            p.x *= scaleRatio;
-            p.y *= scaleRatio;
-        });
-
-        [this.p1, this.p2].forEach(p => {
-            p.x *= scaleRatio;
-            p.y *= scaleRatio;
-            p.tx *= scaleRatio;
-            p.ty *= scaleRatio;
-        });
-
-    }
-
     //GETTERS:
     shouldShowTangents() {
         return this.showtangents;
     }
 
-    getScale() {
-        return this.scaleFactor;
-    }
-
     getControlRadius() {
-        return this.BASE_RADIUS * Math.max(0.5, Math.min(1, this.scaleFactor));
+        return this.BASE_RADIUS;
     }
     getPoints() {
         return {
@@ -108,7 +83,7 @@ export class BezierSystem {
     }
 
     getTangentLength() {
-        return this.BASE_TANGENT_LENGTH * Math.max(0.5, Math.min(1, this.scaleFactor));
+        return this.BASE_TANGENT_LENGTH;
     }
 
     //SETTERS
@@ -121,9 +96,7 @@ export class BezierSystem {
             this.p2.ty = y;
         }
     }
-    setScaleFactor(scale) {
-        this.scaleFactor = scale;
-    }
+    
     setParams(k, damping) {
         this.k = k ? k : this.k;
         this.damping = damping ? damping : this.damping;

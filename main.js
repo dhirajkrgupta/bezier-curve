@@ -11,7 +11,6 @@ document.addEventListener('DOMContentLoaded', () => {
   };
   const canvas = document.getElementById('mycanvas');
   const container = canvas.parentElement;
-
   const system = new BezierSystem(BASE_POSITIONS, null);
   const view = new BezierView(canvas, system);
   const controller = new BezierController(system, view, canvas);
