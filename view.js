@@ -74,11 +74,16 @@ export class BezierView {
     fitTransform(){
         let scaleX=this.canvas.width/this.system.width;
         let scaleY=this.canvas.height/this.system.height;
-        this.ctx.scale(scaleX,scaleY);
+        let scale=Math.min(scaleX,scaleY);
+
+        const offsetX = (this.canvas.width - this.system.width * scale) / 2;
+        const offsetY = (this.canvas.height - this.system.height * scale) / 2;
+
+        this.ctx.translate(offsetX, offsetY);
+        this.ctx.scale(scale, scale);
     }
     render() {
         this.clear();
-        
         this.ctx.save();
         this.fitTransform();
         this.drawCurve();
